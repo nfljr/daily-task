@@ -31,16 +31,24 @@ export default function Dashboard(){
 
     const [title, setTitle] = useState ("");
     const [deadline, SetDeadline] = useState("");
-    const [priority, setPriority] = useState("medium");
+    const [priority, setPriority] = useState("Medium");
     const [search, setSearch] = useState("")
+    const [filterPriority, setFilterPriority] = useState("All");
 
     useEffect(()=> {
         localStorage.setItem("tasks", JSON.stringify(tasks));
     },[tasks]);
 
-    const filteredTasks = tasks.filter((task) => 
-        task.title.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredTasks = tasks.filter((task) => {
+        const macthSearch = task.title
+            .toLowerCase()
+            .includes(search.toLowerCase());
+
+        const matchPriority = 
+            filterPriority === "All" || task.priority === filterPriority;
+
+        return macthSearch && matchPriority;
+    });
     const todoTasks = filteredTasks.filter((task) => task.status === "todo");
     const progressTasks = filteredTasks.filter((task) => task.status === "inprogress");
     const doneTasks = filteredTasks.filter((task) => task.status === "done");
@@ -88,6 +96,15 @@ export default function Dashboard(){
         moveTask (taskId, newStatus)
     }
 
+    function editTask(id, updateData){
+        setTasks(
+            tasks.map((task) => task.id === id
+                ? {...task, ...updateData}
+                : task
+            )
+        );
+    }
+
     return (
         <div className="min-h-screen bg-gray-100 p-10">
             <h1 className="text-3xl font-bold mb-6">
@@ -100,6 +117,15 @@ export default function Dashboard(){
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
             />
+            <select className="border p-2 rounded mb-4"
+                value={filterPriority}
+                onChange={(e) => setFilterPriority(e.target.value)}
+            >
+                <option>All</option>
+                <option>High</option>
+                <option>Medium</option>
+                <option>Low</option>
+            </select>
 
             <div className="bg-white p-4 rounded-lg shadow mb-6">
                     <input 
@@ -133,16 +159,18 @@ export default function Dashboard(){
                         AddTask
                     </button>
                 </div>
+
         <DndContext onDragEnd={handleDragEnd}>
             <div className="grid grid-cols-3 gap-6">
                 {/* Todo */}
-                    <Column id="todo" title="todo" count={todoTasks.length}>
+                    <Column id="todo" title="Todo" count={todoTasks.length}>
                     {todoTasks.map((task) => (
                         <TaskCard 
                             key={task.id} 
                             task={task} 
                             onDelete={deleteTask}  
                             onMove={moveTask}  
+                            onEdit={editTask}
                         />
                     ))}
                     </Column>
@@ -155,6 +183,7 @@ export default function Dashboard(){
                             task={task}
                             onDelete={deleteTask}
                             onMove={moveTask}
+                            onEdit={editTask}
                         />
                     ))}
                     </Column>
@@ -167,6 +196,7 @@ export default function Dashboard(){
                             task={task}
                             onDelete={deleteTask}
                             onMove={moveTask}
+                            onEdit={editTask}
                         />
                     ))}
                     </Column>

@@ -1,8 +1,9 @@
 import { FaTrash } from "react-icons/fa"
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import { useState } from "react";
 
-export default function TaskCard({task, onDelete, onMove}) {
+export default function TaskCard({task, onDelete, onMove, onEdit}) {
     const {attributes, listeners, setNodeRef, transform} = useDraggable({
         id: task.id
     });
@@ -10,6 +11,21 @@ export default function TaskCard({task, onDelete, onMove}) {
     const style = {
         transform: CSS.Translate.toString(transform),
     };
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [editTitle, setEditTitle] = useState(task.title);
+    const [editDeadline, setEditDeadline] = useState(task.deadline);
+    const [editPriority, setEditPriority] = useState(task.priority);
+
+    function handleSave(){
+        onEdit(task.id, {
+            title : editTitle,
+            deadline : editDeadline,
+            priority : editPriority
+        });
+
+        setIsEditing(false);
+    }
 
     function getPriorityColor(priority){
         if (priority === "High"){
@@ -24,7 +40,7 @@ export default function TaskCard({task, onDelete, onMove}) {
             return "bg-green-100 text-green-700";
         }
 
-        return "bg-grey-100 text-grey-700";
+        return "bg-gray-100 text-gray-700";
     }
 
     return (
@@ -41,7 +57,39 @@ export default function TaskCard({task, onDelete, onMove}) {
             > 
                ☰ 
             </div>
+            
+        {isEditing ? (
+            <div className="flex flex-col gap-2">
+                <input 
+                    className="border p-1 rounded"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                />
+                <input
+                    type="date"
+                    className="border p-1 rounded"
+                    value={editDeadline}
+                    onChange={(e)=> setEditDeadline(e.target.value)}
+                />
+                <select 
+                    className="border p-1 rounded"
+                    value={editPriority}
+                    onChange={(e)=> setEditPriority(e.target.value)}
+                >
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                </select>
 
+                <button 
+                    onClick={handleSave}
+                    className="bg-green-500 text-white px-2 py-1 rounded"
+                >
+                    Save
+                </button>
+            </div>
+        ) : (
+            <>
             {/* Title */}
             <h3 className="font-semibold text-gray-800">
                 {task.title}
@@ -64,6 +112,13 @@ export default function TaskCard({task, onDelete, onMove}) {
             >
                 <FaTrash/>
                 Delete
+            </button>
+
+            <button 
+                onClick={()=> setIsEditing(true)}
+                className="text-blue-500 text-sm mt-2"
+            >
+                Edit
             </button>
 
             <div className="flex gap-2 mt-3">
@@ -91,6 +146,8 @@ export default function TaskCard({task, onDelete, onMove}) {
                     >Back</button>
                 )}
             </div>
+            </>
+        )}
         </div>
     );
 }
