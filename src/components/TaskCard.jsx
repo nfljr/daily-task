@@ -3,7 +3,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
 
-export default function TaskCard({task, onDelete, onMove, onEdit}) {
+export default function TaskCard({task, onDelete, onMove, onEdit, darkMode}) {
     const {attributes, listeners, setNodeRef, transform} = useDraggable({
         id: task.id
     });
@@ -47,7 +47,7 @@ export default function TaskCard({task, onDelete, onMove, onEdit}) {
         <div 
             ref={setNodeRef}
             style={style}
-            className="bg-white p-4 rounded-lg shadow mb-3 hover:shadow-md transition"
+            className={`p-4 rounded-lg shadow mb-3 hover:shadow-md transition ${darkMode ? "bg-gray-800 text-white" : "bg-white" }`}
         >
             {/* Drag Handle */}
             <div 

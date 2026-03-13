@@ -1,6 +1,6 @@
 import { useDroppable } from "@dnd-kit/core";
 
-export default function Column({id, title,count, children}) {
+export default function Column({id, title,count, children, darkMode}) {
     const { setNodeRef } = useDroppable({
         id : id
     });
@@ -8,7 +8,9 @@ export default function Column({id, title,count, children}) {
     return (
         <div
             ref={setNodeRef}
-            className="bg-white p-4 rounded-lg shadow min-h-[200px]"
+            className={`p-4 rounded-lg shadow min-h-[200px] ${darkMode ?
+                "bg-gray-800 text-white" : "bg-white"
+            }`}
         >
             <h2 className="font-semibold mb-4">
                 {title} ({count})

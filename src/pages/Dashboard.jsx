@@ -1,9 +1,11 @@
 import TaskCard from "../components/TaskCard";
 import { useState, useEffect } from "react";
 import { DndContext } from "@dnd-kit/core";
-import Column from "../components/Column"
+import Column from "../components/Column";
 
 export default function Dashboard(){
+    const [darkMode, SetDarkMode] = useState(false);
+
     const [tasks, setTasks] = useState(()=> {
         const saved = localStorage.getItem("tasks");
 
@@ -36,8 +38,19 @@ export default function Dashboard(){
     const [filterPriority, setFilterPriority] = useState("All");
 
     useEffect(()=> {
+        const savedTheme = localStorage.getItem("theme");
+        if(savedTheme){
+            SetDarkMode(savedTheme === "dark")
+        }
+    },[]);
+
+    useEffect(()=> {
         localStorage.setItem("tasks", JSON.stringify(tasks));
     },[tasks]);
+
+    useEffect(()=> {
+        localStorage.setItem("theme", darkMode ? "dark" : "light");
+    }, [darkMode]);
 
     const filteredTasks = tasks.filter((task) => {
         const macthSearch = task.title
@@ -49,6 +62,15 @@ export default function Dashboard(){
 
         return macthSearch && matchPriority;
     });
+
+    const totalTasks = tasks.length;
+    const doneCount = tasks.filter((task) => task.status === "done").length;
+    const progressCount = tasks.filter((task) => task.status === "inprogress").length;
+    const todoCount = tasks.filter((task) => task.status === "todo").length;
+
+    const progressPercent = 
+        totalTasks === 0 ? 0 : Math.round((doneCount/ totalTasks) * 100);
+
     const todoTasks = filteredTasks.filter((task) => task.status === "todo");
     const progressTasks = filteredTasks.filter((task) => task.status === "inprogress");
     const doneTasks = filteredTasks.filter((task) => task.status === "done");
@@ -106,18 +128,78 @@ export default function Dashboard(){
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 p-10">
+        <div className={`min-h-screen p-10 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
+            <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold mb-6">
                 Task Manager Dashboard
             </h1>
 
+            <button
+                onClick={() => SetDarkMode(!darkMode)}
+                className="px-3 py-1 rounded bg-gray-200"
+            >
+                {darkMode ? "☀️Light" : "🌑Dark"}
+            </button>
+            </div>
+
+            <div className="grid grid-cols-4 gap-4 mb-6">
+                <div className={`bg-white p-4 rounded shadow ${
+                            darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
+                        }`}>
+                    <p className="text-gray-500 text-sm">Total Task</p>
+                    <p className="text-xl font-bold">{totalTasks}</p>
+                </div>
+
+                <div className={`bg-white p-4 rounded shadow ${
+                            darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
+                        }`}>
+                    <p className="text-gray-500 text-sm">Todo</p>
+                    <p className="text-xl font-bold">{todoCount}</p>
+                </div>
+
+                <div className={`bg-white p-4 rounded shadow ${
+                            darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
+                        }`}>
+                    <p className="text-gray-500 text-sm">In Progress</p>
+                    <p className="text-xl font-bold">{progressCount}</p>
+                </div>
+
+                <div className={`bg-white p-4 rounded shadow ${
+                            darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
+                        }`}>
+                    <p className="text-gray-500 text-sm">Completed</p>
+                    <p className="text-xl font-bold">{doneCount}</p>
+                </div>
+            </div>
+
+            <div className="bg-white p-4 rounded shadow mb-6">
+                <p className="text-sm text-gray-200 mb-2">
+                    Progress: {progressPercent}%
+                </p>
+
+                <div className="w-full bg-gray-200 h-3 rounded">
+                    <div
+                        className="bg-green-500 h-3 rounded"
+                        style={{width: `${progressPercent}%`}}
+                    ></div>
+                </div>
+            </div>
             <input 
                 className="border p-2 rounded w-full mb-4" 
                 placeholder="search task. . ."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
             />
-            <select className="border p-2 rounded mb-4"
+
+            {filteredTasks.length === 0 && (
+                <div className="text-center text-gray-400 mb-6">
+                    No Tasks Found
+                </div>
+            )}
+
+            <select className={`border p-2 rounded mb-4 ${
+                            darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
+                        }`}
                 value={filterPriority}
                 onChange={(e) => setFilterPriority(e.target.value)}
             >
@@ -129,7 +211,9 @@ export default function Dashboard(){
 
             <div className="bg-white p-4 rounded-lg shadow mb-6">
                     <input 
-                        className="border p-2 rounded w-full mb-2"
+                        className={`border p-2 rounded w-full mb-2 ${
+                            darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
+                        }`}
                         placeholder="Task Title"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
@@ -137,13 +221,17 @@ export default function Dashboard(){
 
                     <input
                         type="date"
-                        className="border p-2 rounded w-full mb-2"
+                        className={`border p-2 rounded w-full mb-2 ${
+                            darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
+                        }`}
                         value={deadline}
                         onChange={(e) => SetDeadline(e.target.value)}                    
                     />
 
                     <select 
-                        className="border p-2 rounded w-full mb-2"
+                        className={`border p-2 rounded w-full mb-2 ${
+                            darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
+                        }`}
                         value={priority}
                         onChange={(e) => setPriority(e.target.value)}
                     >
@@ -164,20 +252,31 @@ export default function Dashboard(){
             <div className="grid grid-cols-3 gap-6">
                 {/* Todo */}
                     <Column id="todo" title="Todo" count={todoTasks.length}>
-                    {todoTasks.map((task) => (
-                        <TaskCard 
+                    {todoTasks.length === 0 ?(
+                        <p className="text-gray-400 text-sm text-center">
+                            No Tasks
+                        </p>
+                    ) : (
+                        todoTasks.map((task) => (
+                        <TaskCard
                             key={task.id} 
                             task={task} 
                             onDelete={deleteTask}  
                             onMove={moveTask}  
                             onEdit={editTask}
                         />
-                    ))}
+                        ))
+                    )}
                     </Column>
                 
                 {/* Inprogress */}
                     <Column id="inprogress" title="In Progress" count={progressTasks.length}>
-                    {progressTasks.map((task) => (
+                    {progressTasks.length === 0 ? (
+                        <p className="text-gray-400 text-sm text-center">
+                            No Tasks
+                        </p>
+                    ):(
+                        progressTasks.map((task) => (
                         <TaskCard
                             key={task.id}
                             task={task}
@@ -185,12 +284,18 @@ export default function Dashboard(){
                             onMove={moveTask}
                             onEdit={editTask}
                         />
-                    ))}
+                        ))
+                    )}
                     </Column>
 
                 {/* Done */}
                     <Column id="done" title="Done" count={doneTasks.length}>
-                    {doneTasks.map((task)=>(
+                    {doneTasks.length === 0 ?(
+                        <p className="text-gray-400 text-sm text-center">
+                            No Tasks
+                        </p>
+                    ):(
+                        doneTasks.map((task)=>(
                         <TaskCard
                             key={task.id}
                             task={task}
@@ -198,7 +303,8 @@ export default function Dashboard(){
                             onMove={moveTask}
                             onEdit={editTask}
                         />
-                    ))}
+                    ))
+                    )}
                     </Column>
             </div>
         </DndContext>
