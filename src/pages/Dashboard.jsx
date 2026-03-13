@@ -29,6 +29,8 @@ export default function Dashboard(){
         ];
     });
 
+    const [showModal, setShowmodal] = useState(false);
+
     const [title, setTitle] = useState ("");
     const [deadline, SetDeadline] = useState("");
     const [priority, setPriority] = useState("Medium");
@@ -130,13 +132,69 @@ export default function Dashboard(){
                 Task Manager Dashboard
             </h1>
 
+            <button 
+                onClick={() => setShowmodal(true)}
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+            > 
+                + Add Task
+            </button>
+
             <button
                 onClick={() => SetDarkMode(!darkMode)}
                 className="px-3 py-1 rounded bg-gray-200"
             >
                 {darkMode ? "☀️Light" : "🌑Dark"}
             </button>
+        </div>
+
+        {showModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                <div className={`p-6 rounded-lg shadow w-[350px] ${darkMode ? "bg-gray-900 text-white" : "bg-white"}`}>
+                    <h2 className="text-xl font-semibold mb-4">
+                        Add New Task
+                    </h2>
+
+                    <input 
+                        className={`border p-2 rounded w-full mb-2 ${darkMode ? "bg-gray-900 text-white" : "bg-white"}`}
+                        placeholder="Task Title..."
+                        value={title}
+                        onChange={(e)=> setTitle(e.target.value)}
+                    />
+
+                    <input 
+                        type="date"
+                        className={`border p-2 rounded 2-full mb-2 ${darkMode ? "bg-gray-900 text-white" : "bg-white"}`}
+                        value={deadline}
+                        onChange={(e) => SetDeadline(e.target.value)}
+                    />
+
+                    <select 
+                        className={`border p-2 rounded w-full mb-4 ${darkMode ? "bg-gray-900 text-white" : "bg-white"}`}
+                        value={priority}
+                        onChange={(e) => setPriority(e.target.value)}
+                    >
+                        <option>Low</option>
+                        <option>Medium</option>
+                        <option>High</option>
+                    </select>
+
+                    <div className="flex justify-end gap-2">
+                        <button 
+                            onClick={(e) => setShowmodal(false)}
+                            className="px-3 py-1 bg-gray-300 rounded"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {addTask(); setShowmodal(false);}}
+                            className="px-3 py-1 bg-blue-500 text-white rounded"
+                        >
+                            Add Task
+                        </button>
+                    </div>
+                </div>
             </div>
+        )}
 
             <div className="grid grid-cols-4 gap-4 mb-6">
                 <div className={`p-4 rounded shadow ${
@@ -207,45 +265,6 @@ export default function Dashboard(){
                 <option>Medium</option>
                 <option>Low</option>
             </select>
-
-            <div className="bg-white p-4 rounded-lg shadow mb-6">
-                    <input 
-                        className={`border p-2 rounded w-full mb-2 ${
-                            darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
-                        }`}
-                        placeholder="Task Title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                    />
-
-                    <input
-                        type="date"
-                        className={`border p-2 rounded w-full mb-2 ${
-                            darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
-                        }`}
-                        value={deadline}
-                        onChange={(e) => SetDeadline(e.target.value)}                    
-                    />
-
-                    <select 
-                        className={`border p-2 rounded w-full mb-2 ${
-                            darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
-                        }`}
-                        value={priority}
-                        onChange={(e) => setPriority(e.target.value)}
-                    >
-                        <option>Low</option>
-                        <option >Medium</option>
-                        <option >High</option>
-                    </select>
-
-                    <button 
-                        onClick={addTask}
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                    >
-                        AddTask
-                    </button>
-                </div>
 
         <DndContext onDragEnd={handleDragEnd}>
             <div className="grid grid-cols-3 gap-6">
