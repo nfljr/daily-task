@@ -4,8 +4,6 @@ import { DndContext } from "@dnd-kit/core";
 import Column from "../components/Column";
 
 export default function Dashboard(){
-    const [darkMode, SetDarkMode] = useState(false);
-
     const [tasks, setTasks] = useState(()=> {
         const saved = localStorage.getItem("tasks");
 
@@ -37,12 +35,10 @@ export default function Dashboard(){
     const [search, setSearch] = useState("")
     const [filterPriority, setFilterPriority] = useState("All");
 
-    useEffect(()=> {
+    const [darkMode, SetDarkMode] = useState(()=> {
         const savedTheme = localStorage.getItem("theme");
-        if(savedTheme){
-            SetDarkMode(savedTheme === "dark")
-        }
-    },[]);
+        return savedTheme === "dark";
+    });
 
     useEffect(()=> {
         localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -143,28 +139,28 @@ export default function Dashboard(){
             </div>
 
             <div className="grid grid-cols-4 gap-4 mb-6">
-                <div className={`bg-white p-4 rounded shadow ${
+                <div className={`p-4 rounded shadow ${
                             darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
                         }`}>
                     <p className="text-gray-500 text-sm">Total Task</p>
                     <p className="text-xl font-bold">{totalTasks}</p>
                 </div>
 
-                <div className={`bg-white p-4 rounded shadow ${
+                <div className={`p-4 rounded shadow ${
                             darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
                         }`}>
                     <p className="text-gray-500 text-sm">Todo</p>
                     <p className="text-xl font-bold">{todoCount}</p>
                 </div>
 
-                <div className={`bg-white p-4 rounded shadow ${
+                <div className={`p-4 rounded shadow ${
                             darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
                         }`}>
                     <p className="text-gray-500 text-sm">In Progress</p>
                     <p className="text-xl font-bold">{progressCount}</p>
                 </div>
 
-                <div className={`bg-white p-4 rounded shadow ${
+                <div className={`p-4 rounded shadow ${
                             darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
                         }`}>
                     <p className="text-gray-500 text-sm">Completed</p>
@@ -172,8 +168,8 @@ export default function Dashboard(){
                 </div>
             </div>
 
-            <div className="bg-white p-4 rounded shadow mb-6">
-                <p className="text-sm text-gray-200 mb-2">
+            <div className="p-4 rounded shadow mb-6 ">
+                <p className="text-sm mb-2">
                     Progress: {progressPercent}%
                 </p>
 
@@ -184,8 +180,11 @@ export default function Dashboard(){
                     ></div>
                 </div>
             </div>
+
             <input 
-                className="border p-2 rounded w-full mb-4" 
+                className={`border p-2 rounded w-full mb-4 ${
+                            darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white"
+                        }`}
                 placeholder="search task. . ."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -251,7 +250,7 @@ export default function Dashboard(){
         <DndContext onDragEnd={handleDragEnd}>
             <div className="grid grid-cols-3 gap-6">
                 {/* Todo */}
-                    <Column id="todo" title="Todo" count={todoTasks.length}>
+                    <Column id="todo" title="Todo" count={todoTasks.length} darkMode={darkMode}>
                     {todoTasks.length === 0 ?(
                         <p className="text-gray-400 text-sm text-center">
                             No Tasks
@@ -270,7 +269,7 @@ export default function Dashboard(){
                     </Column>
                 
                 {/* Inprogress */}
-                    <Column id="inprogress" title="In Progress" count={progressTasks.length}>
+                    <Column id="inprogress" title="In Progress" count={progressTasks.length} darkMode={darkMode}>
                     {progressTasks.length === 0 ? (
                         <p className="text-gray-400 text-sm text-center">
                             No Tasks
@@ -289,7 +288,7 @@ export default function Dashboard(){
                     </Column>
 
                 {/* Done */}
-                    <Column id="done" title="Done" count={doneTasks.length}>
+                    <Column id="done" title="Done" count={doneTasks.length} darkMode={darkMode}>
                     {doneTasks.length === 0 ?(
                         <p className="text-gray-400 text-sm text-center">
                             No Tasks

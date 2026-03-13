@@ -9,7 +9,7 @@ export default function Column({id, title,count, children, darkMode}) {
         <div
             ref={setNodeRef}
             className={`p-4 rounded-lg shadow min-h-[200px] ${darkMode ?
-                "bg-gray-800 text-white" : "bg-white"
+                "bg-gray-700 text-white" : "bg-white"
             }`}
         >
             <h2 className="font-semibold mb-4">
